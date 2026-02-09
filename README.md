@@ -184,23 +184,28 @@ Example request (`POST /payments`):
 
 ## Screenshots of Features
 
-### 1. Main Landing
-![Main Landing](src/public/images/hero.JPG)
+### 1. Main Landing![photo_5211067899253036277_w](https://github.com/user-attachments/assets/7125f683-40cd-42e9-ba73-c937527e4b4e)
+
+![Main Landing]()
 Entry section of the platform, showing brand identity and primary navigation.
 
 ### 2. Hotels Catalog
-![Hotels Catalog](src/public/images/hotel-1.jpg)
+![Hotels Catalog]![photo_5211067899253036278_w](https://github.com/user-attachments/assets/c13a2d33-e924-4931-b581-dd5430c48078)
+()
 Hotel listing view where users browse available hotel options.
 
 ### 3. Room Experience
-![Room Experience](src/public/images/room.JPG)
-Room visual used for room details and booking context.
+![Room Experience]()
+Room visual used for room![photo_5211067899253036275_w](https://github.com/user-attachments/assets/023a07d4-9d5f-4f49-bc99-50093204d120)
+ details and booking context.
 
 ### 4. Amenities Preview
-![Amenities Preview](src/public/images/pool.JPG)
+![Amenities Preview](<img width="1281" height="900" alt="Снимок экрана 2026-02-08 201509" src="https://github.com/user-attachments/assets/b59c4d12-6e22-409d-aaed-f6994c016877" />
+)
 Amenities visual section highlighting guest experience.
 
 ## Notes
 
 - Keep `.env` local and never commit it.
 - Use `.env.example` as the environment template.
+
