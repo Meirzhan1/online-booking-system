@@ -187,14 +187,13 @@ Example request (`POST /payments`):
 ## Screenshots of Features
 
 ### 1. Main Landing
-Main Landing!(![photo_5211067899253036277_w](https://github.com/user-attachments/assets/67b5f803-2bd9-4e7a-84b9-496a455abd82)
-)
+Main Landing![photo_5211067899253036277_w](https://github.com/user-attachments/assets/67b5f803-2bd9-4e7a-84b9-496a455abd82)
 
 Entry section of the platform, showing brand identity and primary navigation.
 
 ### 2. Hotels Catalog
-![Hotels Catalog](![photo_5211067899253036278_w](https://github.com/user-attachments/assets/838f81db-cfe5-40a6-9d0d-a4b7399f8741)
-)
+![photo_5211067899253036278_w](https://github.com/user-attachments/assets/838f81db-cfe5-40a6-9d0d-a4b7399f8741)
+
 Hotel listing view where users browse available hotel options.
 
 ### 3. Room Experience
@@ -204,8 +203,8 @@ Room visual used for room!(![photo_5211067899253036275_w](https://github.com/use
  details and booking context.
 
 ### 4. Amenities Preview
-![Amenities Preview](![photo_5211067899253036275_w](https://github.com/user-attachments/assets/1de090db-250b-48ac-bc6a-2a08f3d333a4)
-)
+![photo_5211067899253036275_w](https://github.com/user-attachments/assets/1de090db-250b-48ac-bc6a-2a08f3d333a4)
+
 Amenities visual section highlighting guest experience.
 
 
@@ -215,6 +214,7 @@ Amenities visual section highlighting guest experience.
 
 - Keep `.env` local and never commit it.
 - Use `.env.example` as the environment template.
+
 
 
 
