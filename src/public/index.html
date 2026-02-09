@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hotel Booking</title>
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-left">
+      <a class="nav-link" href="./hotels.html">Hotels</a>
+    </div>
+
+    <div class="brand">
+      <img class="brand-logo" src="./images/delux_l.png" alt="Delux Hotels">
+    </div>
+
+    <div class="nav-right">
+      <a class="nav-link nav-user" href="./profile.html" style="display:none;">Profile</a>
+      <a class="nav-link nav-user" href="./my-bookings.html" style="display:none;">My bookings</a>
+      <a class="nav-link nav-admin" href="./admin-hotels.html" style="display:none;">Admin hotels</a>
+      <a class="nav-link nav-admin" href="./admin-rooms.html" style="display:none;">Admin rooms</a>
+
+      <a class="nav-link nav-guest" href="#" id="openAuth">Sign in</a>
+      <button class="icon-btn nav-logout" style="display:none;" title="Logout">⎋</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-card">
+    <img src="images/hero.JPG" alt="Hero"/>
+    <div class="hero-overlay">
+      <div class="hero-title">
+        <span>Welcome To</span>
+        <span>Hotel Booking</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY SEARCH -->
+  <div class="search-wrap">
+    <div class="search-bar">
+      <div class="search-pill">
+
+        <div class="segment" id="segDest">
+          <div class="seg-title">Destinations</div>
+          <div class="seg-sub" id="destSub">Enter a destination or hotel</div>
+        </div>
+
+        <div class="segment" id="segDates">
+          <div class="seg-title">Check in - Check out</div>
+          <div class="seg-sub" id="datesSub">Select dates</div>
+        </div>
+
+        <div class="segment" id="segGuests">
+          <div class="seg-title">Guests</div>
+          <div class="seg-sub" id="guestsSub">1 room(s) - 2 guest(s)</div>
+        </div>
+        <div class="search-btn" id="btnSearch" title="Search">
+          <div class="circle" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Modals ===== -->
+
+<!-- DESTINATION modal (simple) -->
+<div class="modal" id="mDest">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b>Destinations</b>
+      <button class="modal-close" data-close="mDest">✕</button>
+    </div>
+    <div class="modal-body">
+      <input id="destInput" placeholder="City or hotel name..." style="width:100%; padding:14px 12px; border-radius:10px; border:1px solid var(--line);"/>
+      <div style="margin-top:10px; color: var(--muted); font-size: 13px;">
+        Tip: Enter a city or hotel name. For example: "Almaty", "Comfort Inn", etc.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR modal (как на фото) -->
+<div class="modal" id="mDates">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b>Choose dates</b>
+      <button class="modal-close" data-close="mDates">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="cal-grid">
+        <div class="cal" id="cal1"></div>
+        <div class="cal" id="cal2"></div>
+      </div>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+        <button class="icon-btn" id="btnClearDates" title="Clear">⟲</button>
+        <button class="icon-btn" id="btnApplyDates" title="Apply">✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GUESTS modal -->
+<div class="modal" id="mGuests">
+  <div class="modal-card" style="max-width:720px;">
+    <div class="modal-head">
+      <b>Guests</b>
+      <button class="modal-close" data-close="mGuests">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="guests">
+        <div class="g-row">
+          <div>
+            <b>Adult(s)</b><div style="color:var(--muted);font-size:13px;">Age 12+</div>
+          </div>
+          <div class="counter">
+            <button class="c-btn" id="adMinus">−</button>
+            <b id="adVal">2</b>
+            <button class="c-btn" id="adPlus">+</button>
+          </div>
+        </div>
+
+        <div class="g-row">
+          <div>
+            <b>Child(ren)</b><div style="color:var(--muted);font-size:13px;">Age 0–11</div>
+          </div>
+          <div class="counter">
+            <button class="c-btn" id="chMinus">−</button>
+            <b id="chVal">0</b>
+            <button class="c-btn" id="chPlus">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+        <button class="icon-btn" id="btnApplyGuests" title="Apply">✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH modal (login/register in one popup) -->
+<div class="modal auth-modal" id="mAuth">
+  <div class="modal-card" style="max-width:520px;">
+    <div class="modal-head">
+      <b id="authTitle">Sign in</b>
+      <button class="modal-close" data-close="mAuth">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex; gap:8px; margin-bottom:14px;">
+        <button id="tabLogin" class="icon-btn" type="button">Login</button>
+        <button id="tabRegister" class="icon-btn" type="button">Register</button>
+      </div>
+
+      <form id="formLogin" style="display:block; display:grid; gap:10px;">
+        <input id="loginEmail" type="email" placeholder="Email" required/>
+        <input id="loginPassword" type="password" placeholder="Password" required/>
+        <button type="submit" class="btn-pill primary">Login</button>
+      </form>
+
+      <form id="formRegister" style="display:none; display:grid; gap:10px;">
+        <input id="regFullName" type="text" placeholder="Full name" required/>
+        <input id="regEmail" type="email" placeholder="Email" required/>
+        <input id="regPassword" type="password" placeholder="Password (min 6)" minlength="6" required/>
+        <input id="regAdminSecret" type="text" placeholder="Admin secret (optional)"/>
+        <button type="submit" class="btn-pill primary">Create account</button>
+      </form>
+
+      <div id="authError" class="alert" style="display:none; margin-top:10px;"></div>
+    </div>
+  </div>
+</div>
+<section class="about-wrap" id="about">
+  <div class="about-inner">
+    <h2 class="about-title">About us</h2>
+    <p class="about-text">
+      DELUX HOTELS blends refined design, modern comfort, and flawless service.
+      We create spaces where every guest feels special - and every stay becomes unforgettable.
+    </p>
+    <p class="about-text">
+      Discover carefully selected destinations, thoughtful interiors, and hospitality inspired by global standards.
+    </p>
+
+    <div class="about-grid">
+      <!-- Card 1 -->
+      <a class="about-card" href="./hotels.html">
+        <img
+          src="./images/pool.JPG"
+          alt="Luxury pool"
+          loading="lazy"
+        />
+        <div class="about-card-overlay">
+          <div class="about-card-title">Resorts & Pools</div>
+          <div class="about-card-sub">Explore hotels</div>
+        </div>
+      </a>
+
+      <!-- Card 2 -->
+      <a class="about-card" href="./hotels.html">
+        <img
+          src="./images/room.JPG"
+          alt="Luxury room"
+          loading="lazy"
+        />
+        <div class="about-card-overlay">
+          <div class="about-card-title">Rooms & Suites</div>
+          <div class="about-card-sub">Explore hotels</div>
+        </div>
+      </a>
+
+      <!-- Card 3 -->
+      <a class="about-card" href="./hotels.html">
+        <img
+          src="./images/dining.JPG"
+          alt="Dining"
+          loading="lazy"
+        />
+        <div class="about-card-overlay">
+          <div class="about-card-title">Dining & Experience</div>
+          <div class="about-card-sub">Explore hotels</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="about-cta">
+      <a class="about-btn" href="./hotels.html">Discover our hotels</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="about">
+  <h2>Contact us</h2>
+  <p>Stay in touch  updates & offers.</p>
+  <p>Email: <b>alikhanoryn@gmail.com</b></p>
+  <p>Phone: <b>+77054547015</b></p>
+
+  <div class="socials">
+    <a href="#" title="Instagram" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="4" y="4" width="16" height="16" rx="4"></rect>
+        <circle cx="12" cy="12" r="3.5"></circle>
+        <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"></circle>
+      </svg>
+    </a>
+    <a href="#" title="YouTube" aria-label="YouTube">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10 15l5-3-5-3v6z" fill="currentColor"></path>
+        <rect x="3" y="7" width="18" height="10" rx="3"></rect>
+      </svg>
+    </a>
+    <a href="#" title="Facebook" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13 22v-8h3l1-4h-4V7.5c0-1.1.3-1.8 1.9-1.8H18V2.1C17.4 2 15.9 2 14.2 2 10.7 2 9 4.1 9 7.1V10H6v4h3v8h4z"/>
+      </svg>
+    </a>
+    <a href="#" title="X" aria-label="X">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.5l-5.1-6.6L5.7 22H2.6l7.3-8.4L1.2 2h6.7l4.6 6 6.4-6z"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="copy">© 2026 DELUX HOTELS UI</div>
+</footer>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="./api.js"></script>
+<script src="./nav-auth.js"></script>
+<script>
+/* ===== role nav ===== */
+/* ===== modal helpers ===== */
+function openM(id){ document.getElementById(id).classList.add("open"); }
+function closeM(id){ document.getElementById(id).classList.remove("open"); }
+
+document.querySelectorAll("[data-close]").forEach(btn=>{
+  btn.addEventListener("click", ()=> closeM(btn.dataset.close));
+});
+document.querySelectorAll(".modal").forEach(m=>{
+  m.addEventListener("click", (e)=>{ if(e.target === m) m.classList.remove("open"); });
+});
+
+/* ===== Search state ===== */
+let state = {
+  destination: "",
+  checkIn: null,
+  checkOut: null,
+  adults: 2,
+  children: 0
+};
+
+const destSub = document.getElementById("destSub");
+const datesSub = document.getElementById("datesSub");
+const guestsSub = document.getElementById("guestsSub");
+
+function fmt(d){
+  const x = new Date(d);
+  const mm = String(x.getMonth()+1).padStart(2,"0");
+  const dd = String(x.getDate()).padStart(2,"0");
+  return `${dd}.${mm}.${x.getFullYear()}`;
+}
+
+function syncUI(){
+  destSub.textContent = state.destination ? state.destination : "Enter a destination or hotel";
+  if (state.checkIn && state.checkOut){
+    datesSub.textContent = `${fmt(state.checkIn)} → ${fmt(state.checkOut)}`;
+  } else {
+    datesSub.textContent = "Select dates";
+  }
+  const guests = state.adults + state.children;
+  guestsSub.textContent = `1 room(s) - ${guests} guest(s)`;
+}
+syncUI();
+
+/* ===== Segments open ===== */
+document.getElementById("segDest").onclick = () => {
+  openM("mDest");
+  const input = document.getElementById("destInput");
+  input.value = state.destination || "";
+  setTimeout(()=>input.focus(), 50);
+};
+document.getElementById("segDates").onclick = () => openM("mDates");
+document.getElementById("segGuests").onclick = () => openM("mGuests");
+// no special rates segment
+
+/* ===== Destination apply on typing (simple) ===== */
+document.getElementById("destInput").addEventListener("input", (e)=>{
+  state.destination = e.target.value.trim();
+  syncUI();
+});
+
+/* ===== Guests ===== */
+const adVal = document.getElementById("adVal");
+const chVal = document.getElementById("chVal");
+
+function syncGuests(){
+  adVal.textContent = String(state.adults);
+  chVal.textContent = String(state.children);
+  document.getElementById("adMinus").disabled = state.adults <= 1;
+  document.getElementById("chMinus").disabled = state.children <= 0;
+}
+syncGuests();
+
+document.getElementById("adMinus").onclick = ()=>{ state.adults = Math.max(1, state.adults-1); syncGuests(); };
+document.getElementById("adPlus").onclick  = ()=>{ state.adults = Math.min(10, state.adults+1); syncGuests(); };
+
+document.getElementById("chMinus").onclick = ()=>{ state.children = Math.max(0, state.children-1); syncGuests(); };
+document.getElementById("chPlus").onclick  = ()=>{ state.children = Math.min(10, state.children+1); syncGuests(); };
+
+document.getElementById("btnApplyGuests").onclick = ()=>{
+  closeM("mGuests");
+  syncUI();
+};
+
+/* ===== Calendar (2 months, click to select start/end) ===== */
+let pickStage = 0; // 0 start, 1 end
+
+function monthName(m){
+  return ["January","February","March","April","May","June","July","August","September","October","November","December"][m];
+}
+
+function buildCalendar(containerId, year, month){
+  const el = document.getElementById(containerId);
+  const first = new Date(year, month, 1);
+  const startDay = (first.getDay()+6)%7; // Mon=0
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+
+  const weeks = [];
+  let day = 1 - startDay;
+  for(let w=0; w<6; w++){
+    const row = [];
+    for(let i=0; i<7; i++){
+      row.push(day);
+      day++;
+    }
+    weeks.push(row);
+  }
+
+  const title = `
+    <div class="cal-title">
+      <span>${monthName(month)} <span style="font-weight:500;opacity:.7">${year}</span></span>
+      <span style="opacity:.6">›</span>
+    </div>
+  `;
+
+  const head = `
+    <table class="cal-table">
+      <thead>
+        <tr>
+          <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+        </tr>
+      </thead>
+      <tbody>
+      ${weeks.map(r=>`
+        <tr>
+          ${r.map(n=>{
+            const inMonth = n>=1 && n<=daysInMonth;
+            if(!inMonth) return `<td class="disabled">${""}</td>`;
+            const date = new Date(year, month, n);
+            const iso = date.toISOString();
+            const sel =
+              (state.checkIn && new Date(state.checkIn).toDateString()===date.toDateString()) ||
+              (state.checkOut && new Date(state.checkOut).toDateString()===date.toDateString());
+            return `<td data-iso="${iso}" class="${sel ? "sel": ""}">${n}</td>`;
+          }).join("")}
+        </tr>
+      `).join("")}
+      </tbody>
+    </table>
+  `;
+
+  el.innerHTML = title + head;
+
+  el.querySelectorAll("td[data-iso]").forEach(td=>{
+    td.addEventListener("click", ()=>{
+      const iso = td.dataset.iso;
+      if (pickStage === 0){
+        state.checkIn = iso;
+        state.checkOut = null;
+        pickStage = 1;
+      } else {
+        const inD = new Date(state.checkIn);
+        const outD = new Date(iso);
+        if (outD <= inD){
+          // если выбрали раньше — считаем это новым checkIn
+          state.checkIn = iso;
+          state.checkOut = null;
+          pickStage = 1;
+        } else {
+          state.checkOut = iso;
+          pickStage = 0;
+        }
+      }
+      renderCalendars();
+      syncUI();
+    });
+  });
+}
+
+function renderCalendars(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+
+  buildCalendar("cal1", y, m);
+  buildCalendar("cal2", y, (m+1)%12);
+
+  // если месяц перелистнулся на январь — год нужен +1 (упрощенно):
+  // (если хочешь идеально — скажи, сделаю полный)
+}
+
+document.getElementById("btnClearDates").onclick = ()=>{
+  state.checkIn = null;
+  state.checkOut = null;
+  pickStage = 0;
+  renderCalendars();
+  syncUI();
+};
+
+document.getElementById("btnApplyDates").onclick = ()=>{
+  closeM("mDates");
+  syncUI();
+};
+
+renderCalendars();
+
+/* ===== Search action =====
+   If we can find exact one hotel by destination – go directly to its rooms.
+   Otherwise save search and go to hotels page.
+*/
+document.getElementById("btnSearch").onclick = async ()=>{
+  if (!state.destination){
+    showToast("Please enter a destination.", "error");
+    return;
+  }
+  if (!state.checkIn || !state.checkOut){
+    showToast("Please select check-in and check-out dates.", "error");
+    return;
+  }
+
+  const search = {
+    destination: state.destination,
+    checkIn: state.checkIn,
+    checkOut: state.checkOut,
+    adults: state.adults,
+    children: state.children
+  };
+  sessionStorage.setItem("search", JSON.stringify(search));
+
+  try{
+    const hotels = await api("/api/hotels" + qs({ q: state.destination }));
+    if (Array.isArray(hotels) && hotels.length === 1){
+      const h = hotels[0];
+      const url = "./hotel.html?hotelId=" +
+        encodeURIComponent(h._id) +
+        "&checkIn=" + encodeURIComponent(search.checkIn) +
+        "&checkOut=" + encodeURIComponent(search.checkOut);
+      location.href = url;
+    } else {
+      location.href = "./hotels.html";
+    }
+  } catch(e){
+    location.href = "./hotels.html";
+  }
+};
+
+/* ===== Auth popup on home ===== */
+const mAuth = document.getElementById("mAuth");
+const formLogin = document.getElementById("formLogin");
+const formRegister = document.getElementById("formRegister");
+const tabLogin = document.getElementById("tabLogin");
+const tabRegister = document.getElementById("tabRegister");
+const authTitle = document.getElementById("authTitle");
+const authError = document.getElementById("authError");
+
+function openAuth(mode){
+  openM("mAuth");
+  setAuthMode(mode || "login");
+}
+
+function setAuthMode(mode){
+  const isLogin = mode === "login";
+  authTitle.textContent = isLogin ? "Sign in" : "Create account";
+  formLogin.style.display = isLogin ? "grid" : "none";
+  formRegister.style.display = isLogin ? "none" : "grid";
+}
+
+document.getElementById("openAuth").addEventListener("click", (e)=>{
+  e.preventDefault();
+  openAuth("login");
+});
+
+tabLogin.addEventListener("click", ()=> setAuthMode("login"));
+tabRegister.addEventListener("click", ()=> setAuthMode("register"));
+
+function setAuthError(msg){
+  if (!msg){
+    authError.style.display = "none";
+    authError.textContent = "";
+    return;
+  }
+  authError.style.display = "block";
+  authError.textContent = msg;
+}
+
+formLogin.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  setAuthError("");
+  try{
+    const body = {
+      email: document.getElementById("loginEmail").value.trim(),
+      password: document.getElementById("loginPassword").value
+    };
+    const res = await api("/auth/login", { method:"POST", body });
+    if (res?.token){
+      sessionStorage.setItem("token", res.token);
+      closeM("mAuth");
+      location.reload();
+    }
+  } catch(err){
+    setAuthError(err.message);
+  }
+});
+
+formRegister.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  setAuthError("");
+  try{
+    const fullName = document.getElementById("regFullName").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value;
+    const adminSecret = document.getElementById("regAdminSecret").value.trim();
+    if (!fullName || !email || !password){
+      throw new Error("Fill full name, email and password");
+    }
+    const isAdmin = !!adminSecret;
+    const path = isAdmin ? "/auth/register-admin" : "/auth/register";
+    const body = isAdmin
+      ? { fullName, email, password, adminSecret }
+      : { fullName, email, password };
+    const res = await api(path, { method:"POST", body });
+    if (res?.token){
+      sessionStorage.setItem("token", res.token);
+      closeM("mAuth");
+      location.reload();
+    }
+  } catch(err){
+    setAuthError(err.message);
+  }
+});
+
+// auto-open auth if some page asked for it
+(function maybeOpenAuthFromRedirect(){
+  const mode = sessionStorage.getItem("openAuth");
+  if (mode){
+    sessionStorage.removeItem("openAuth");
+    openAuth(mode === "register" ? "register" : "login");
+  }
+})();
+</script>
+
+</body>
+</html>
+

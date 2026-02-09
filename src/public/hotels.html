@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hotels — DELUX</title>
+  <link rel="stylesheet" href="./styles.css"/>
+
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <a class="nav-link" href="./index.html">Home</a>
+      </div>
+      <div class="brand">
+        <img class="brand-logo" src="./images/delux_l.png" alt="Delux Hotels">
+      </div>
+      <div class="nav-right">
+        <a class="nav-link nav-user" href="./profile.html" style="display:none;">Profile</a>
+        <a class="nav-link nav-user" href="./my-bookings.html" style="display:none;">My bookings</a>
+        <a class="nav-link nav-admin" href="./admin-hotels.html" style="display:none;">Admin hotels</a>
+        <a class="nav-link nav-admin" href="./admin-rooms.html" style="display:none;">Admin rooms</a>
+        <button class="icon-btn nav-logout" style="display:none;" title="Logout">⎋</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="page-head">
+      <h1>Our Hotels</h1>
+      <p>Swipe through destinations — the description changes with each hotel.</p>
+    </div>
+
+    <section class="carousel" aria-label="Hotels carousel">
+      <div class="carousel-stage" id="stage">
+
+        <div class="slide active" data-index="0" data-hotelid="1ce6113b6230439bf1fdddab">
+  <a href="./hotel.html?hotelId=1ce6113b6230439bf1fdddab">
+    <img src="./images/almaty.JPG" alt="Almaty Comfort Inn">
+  </a>
+</div>
+
+<div class="slide" data-index="1" data-hotelid="7185087049419bd7d25a55cc">
+  <a href="./hotel.html?hotelId=7185087049419bd7d25a55cc">
+    <img src="./images/aktau.JPG" alt="Aktau Sea View">
+  </a>
+</div>
+
+<div class="slide" data-index="2" data-hotelid="ec47c0e40f422b8629741c68">
+  <a href="./hotel.html?hotelId=ec47c0e40f422b8629741c68">
+    <img src="./images/shymkent.JPG" alt="Shymkent Plaza">
+  </a>
+</div>
+
+<div class="slide" data-index="3" data-hotelid="697f8d192f3ecad7048c0b5e">
+  <a href="./hotel.html?hotelId=697f8d192f3ecad7048c0b5e">
+    <img src="./images/oral.JPG" alt="DeLux">
+  </a>
+</div>
+
+<div class="slide" data-index="4" data-hotelid="698232f095b6d9eca03bd6e6">
+  <a href="./hotel.html?hotelId=698232f095b6d9eca03bd6e6">
+    <img src="./images/oskemen.JPG" alt="Oskemen Land Hotel">
+  </a>
+</div>
+
+
+        <div class="car-btn car-prev" id="prevBtn" aria-label="Previous">‹</div>
+        <div class="car-btn car-next" id="nextBtn" aria-label="Next">›</div>
+
+        <div class="dots" id="dots" aria-label="Slide indicators"></div>
+
+      </div>
+
+      <div class="hotel-info">
+        <h2 class="hotel-title" id="hTitle">—</h2>
+        <div class="hotel-meta" id="hMeta">—</div>
+        <div class="hotel-desc" id="hDesc">—</div>
+
+        <div class="hotel-actions">
+          <div class="left">
+            <a class="btn-pill primary" id="viewBtn" href="./hotel.html">View hotel</a>
+            <a class="btn-pill" id="roomsBtn" href="./hotel.html">See rooms</a>
+          </div>
+          <div class="small-note" id="hNote">Click the photo to open the hotel page.</div>
+        </div>
+      </div>
+
+      <div class="thumbs" id="thumbs"></div>
+    </section>
+  </main>
+
+  <script src="./api.js"></script>
+  <script src="./nav-auth.js"></script>
+  <script>
+    const HOTELS = [
+      {
+        id: "1ce6113b6230439bf1fdddab",
+        title: "Almaty Comfort Inn",
+        city: "Almaty",
+        desc: "A cozy city-center hotel with warm interiors, mountain views, and easy access to Almaty’s cafes, parks and business districts.",
+        note: "Rating: 4.3 • Abay Ave 55"
+      },
+      {
+        id: "7185087049419bd7d25a55cc",
+        title: "Aktau Sea View",
+        city: "Aktau",
+        desc: "Sea-side hotel overlooking the Caspian, ideal for sunsets, long walks by the water, and relaxed weekend escapes.",
+        note: "Rating: 4.6 • Caspian Coast 1"
+      },
+      {
+        id: "ec47c0e40f422b8629741c68",
+        title: "Shymkent Plaza",
+        city: "Shymkent",
+        desc: "Modern business hotel with bright rooms, conference spaces, and quick access to Shymkent’s main avenues.",
+        note: "Rating: 4.5 • Tauke Khan 22"
+      },
+      {
+        id: "697f8d192f3ecad7048c0b5e",
+        title: "DeLux",
+        city: "Oral",
+        desc: "Flagship DELUX property in Oral with refined rooms, signature dining, and a calm riverside atmosphere.",
+        note: "Rating: 5.0 • Nazarbaev d."
+      },
+      {
+        id: "698232f095b6d9eca03bd6e6",
+        title: "Oskemen Land Hotel",
+        city: "Oskemen",
+        desc: "Comfortable base in Oskemen with spacious rooms, family-friendly facilities and quick routes to nature spots.",
+        note: "Rating: 4.0 • Mura ko. 7"
+      }
+    ];
+
+
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dotsEl = document.getElementById("dots");
+    const thumbsEl = document.getElementById("thumbs");
+
+    const titleEl = document.getElementById("hTitle");
+    const metaEl = document.getElementById("hMeta");
+    const descEl = document.getElementById("hDesc");
+    const noteEl = document.getElementById("hNote");
+
+    const viewBtn = document.getElementById("viewBtn");
+    const roomsBtn = document.getElementById("roomsBtn");
+
+    let index = 0;
+    let timer = null;
+
+    function setActive(i){
+      index = (i + slides.length) % slides.length;
+
+      slides.forEach((s, k) => s.classList.toggle("active", k === index));
+
+      Array.from(dotsEl.children).forEach((d, k) => d.classList.toggle("active", k === index));
+
+      Array.from(thumbsEl.children).forEach((t, k) => t.classList.toggle("active", k === index));
+
+      const hid = slides[index].dataset.hotelid;
+      const h = HOTELS.find(x => x.id === hid) || HOTELS[index];
+
+      titleEl.textContent = h?.title || "Hotel";
+      metaEl.textContent  = h?.city || "";
+      descEl.textContent  = h?.desc || "";
+      noteEl.textContent  = h?.note || "Click the photo to open the hotel page.";
+
+      const link = "./hotel.html?hotelId=" + encodeURIComponent(hid);
+      viewBtn.href = link;
+      roomsBtn.href = link;
+    }
+
+    function next(){ setActive(index + 1); }
+    function prev(){ setActive(index - 1); }
+
+    function buildDots(){
+      dotsEl.innerHTML = "";
+      slides.forEach((_, i) => {
+        const d = document.createElement("div");
+        d.className = "dot" + (i === index ? " active" : "");
+        d.onclick = () => { setActive(i); restartAuto(); };
+        dotsEl.appendChild(d);
+      });
+    }
+
+    function buildThumbs(){
+      thumbsEl.innerHTML = "";
+      slides.forEach((s, i) => {
+        const img = s.querySelector("img");
+        const t = document.createElement("div");
+        t.className = "thumb" + (i === index ? " active" : "");
+        t.innerHTML = `<img src="${img.getAttribute("src")}" alt="thumb">`;
+        t.onclick = () => { setActive(i); restartAuto(); };
+        thumbsEl.appendChild(t);
+      });
+    }
+
+    function startAuto(){
+      stopAuto();
+      timer = setInterval(next, 4500);
+    }
+    function stopAuto(){
+      if (timer) clearInterval(timer);
+      timer = null;
+    }
+    function restartAuto(){
+      startAuto();
+    }
+
+    document.getElementById("nextBtn").onclick = () => { next(); restartAuto(); };
+    document.getElementById("prevBtn").onclick = () => { prev(); restartAuto(); };
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { next(); restartAuto(); }
+      if (e.key === "ArrowLeft")  { prev(); restartAuto(); }
+    });
+
+    buildDots();
+    buildThumbs();
+    setActive(0);
+    startAuto();
+
+    const stage = document.getElementById("stage");
+    stage.addEventListener("mouseenter", stopAuto);
+    stage.addEventListener("mouseleave", startAuto);
+
+    try{
+      const raw = sessionStorage.getItem("search");
+      if (raw){
+        const s = JSON.parse(raw);
+        if (s.destination){
+          const found = HOTELS.findIndex(h => h.city.toLowerCase().includes(s.destination.toLowerCase()) || h.title.toLowerCase().includes(s.destination.toLowerCase()));
+          if (found >= 0) setActive(found);
+        }
+      }
+    } catch(e){}
+  </script>
+</body>
+</html>

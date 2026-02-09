@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Profile - DELUX</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <style>
+    .profile-page{display:grid;gap:16px}
+    .profile-page .card{
+      border-radius:24px;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 20px 40px rgba(0,0,0,.05);
+      background:linear-gradient(180deg,#ffffff 0%, #fbfaf7 100%);
+    }
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:10px}
+    .section-hint{color:#7b7b7b;font-size:13px}
+
+    .user-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+    .info-card{padding:12px;border-radius:12px;background:#f7f5ef;border:1px solid rgba(0,0,0,.05)}
+    .info-label{font-size:12px;color:#7b7b7b;text-transform:uppercase;letter-spacing:.05em}
+    .info-value{margin-top:4px;font-weight:600;word-break:break-word}
+
+    #bookingsBox{display:grid;gap:14px;margin-top:14px}
+    .booking-card{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:16px;
+      background:#fff;
+      box-shadow:0 8px 20px rgba(0,0,0,.04);
+    }
+    .booking-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .booking-sub{margin-top:6px;color:#727272;font-size:14px}
+    .status-pill{
+      display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;
+      font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid transparent
+    }
+    .status-pill.pending{background:#fff4db;color:#8f5f00;border-color:#f1d395}
+    .status-pill.confirmed{background:#e9f8ee;color:#156a37;border-color:#b7e3c5}
+    .status-pill.canceled{background:#f7ecec;color:#8b2f2f;border-color:#e3bdbd}
+
+    .booking-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:14px}
+    .muted-note{margin-top:12px;color:#767676;font-size:13px}
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-left">
+      <a class="nav-link" href="./index.html">Home</a>
+      <a class="nav-link" href="./hotels.html">Hotels</a>
+    </div>
+    <div class="brand">
+      <img class="brand-logo" src="./images/delux_l.png" alt="Delux Hotels">
+    </div>
+    <div class="nav-right">
+      <a class="nav-link nav-user" href="./profile.html" style="display:none;">Profile</a>
+      <a class="nav-link nav-user" href="./my-bookings.html" style="display:none;">My bookings</a>
+      <a class="nav-link nav-admin" href="./admin-hotels.html" style="display:none;">Admin hotels</a>
+      <a class="nav-link nav-admin" href="./admin-rooms.html" style="display:none;">Admin rooms</a>
+      <button class="icon-btn nav-logout" style="display:none;" title="Logout">Logout</button>
+    </div>
+  </div>
+</header>
+
+<main class="container profile-page">
+  <div class="card">
+    <div class="section-head">
+      <h1 class="h" style="margin:0">Profile</h1>
+      <div class="section-hint">Account summary</div>
+    </div>
+    <div id="userBox" class="small" style="margin-top:12px">Loading profile...</div>
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <h2 class="h" style="margin:0">My bookings</h2>
+      <div class="section-hint">Latest reservations</div>
+    </div>
+    <div id="bookingsBox" class="small">Loading bookings...</div>
+  </div>
+</main>
+
+<script src="./api.js"></script>
+<script src="./nav-auth.js"></script>
+<script>
+  async function loadProfile(){
+    try{
+      const me = await api("/users/me");
+      if (!me) throw new Error("Profile is empty");
+      const box = document.getElementById("userBox");
+      box.innerHTML = `
+        <div class="user-grid">
+          <div class="info-card">
+            <div class="info-label">Name</div>
+            <div class="info-value">${me.fullName || "-"}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">Email</div>
+            <div class="info-value">${me.email || "-"}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">Role</div>
+            <div class="info-value">${me.role || "-"}</div>
+          </div>
+        </div>
+      `;
+    } catch(err){
+      document.getElementById("userBox").innerHTML = "<div class='alert'>" + (err.message || "Failed to load profile") + "</div>";
+    }
+  }
+
+  async function loadBookings(){
+    try{
+      const list = await api("/api/bookings/my");
+      const box = document.getElementById("bookingsBox");
+      if (!Array.isArray(list) || list.length === 0){
+        box.innerHTML = "<p class='muted-note'>No bookings yet.</p>";
+        return;
+      }
+
+      box.innerHTML = list.map((b) => {
+        const room = b.roomId || {};
+        const hotel = room.hotelId || {};
+        const inD = b.checkIn ? new Date(b.checkIn).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "2-digit", year: "numeric" }) : "-";
+        const outD = b.checkOut ? new Date(b.checkOut).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "2-digit", year: "numeric" }) : "-";
+        const status = (b.status || "UNKNOWN").toUpperCase();
+        const statusClass = status.toLowerCase();
+
+        return `
+          <div class="booking-card">
+            <div class="booking-top">
+              <div>
+                <h3>${hotel.name || "Hotel"} (${hotel.city || "-"})</h3>
+                <div class="booking-sub">Reservation #${b._id ? String(b._id).slice(-6).toUpperCase() : "-"}</div>
+              </div>
+              <div class="status-pill ${statusClass}">${status}</div>
+            </div>
+
+            <div class="booking-grid">
+              <div class="info-card">
+                <div class="info-label">Room</div>
+                <div class="info-value">${room.roomNumber || "-"} (${room.type || "-"})</div>
+              </div>
+              <div class="info-card">
+                <div class="info-label">Dates</div>
+                <div class="info-value">${inD} &rarr; ${outD}</div>
+              </div>
+              <div class="info-card">
+                <div class="info-label">Total</div>
+                <div class="info-value">${(b.totalPrice ?? 0).toLocaleString("en-US")} KZT</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } catch(err){
+      document.getElementById("bookingsBox").innerHTML = "<div class='alert'>" + (err.message || "Failed to load bookings") + "</div>";
+    }
+  }
+
+  (async function init(){
+    const token = sessionStorage.getItem("token");
+    if (!token){
+      location.href = "./index.html";
+      return;
+    }
+    await loadProfile();
+    await loadBookings();
+  })();
+</script>
+
+</body>
+</html>

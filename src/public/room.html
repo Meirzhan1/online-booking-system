@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Room Details</title>
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+   <div class="nav">
+<a class="badge nav-admin" href="./admin-hotels.html">Admin Hotels</a>
+<a class="badge nav-admin" href="./admin-rooms.html">Admin Rooms</a>
+<a class="badge nav-user"  href="./my-bookings.html">My bookings</a>
+
+<a class="badge nav-guest" href="./login.html">Login</a>
+<a class="badge nav-guest" href="./register.html">Register</a>
+
+<button class="badge nav-logout" style="display:none;">Logout</button>
+
+</div>
+    <span class="small" id="hotelName"></span>
+  </div>
+
+  <div class="card">
+    <h1 class="h">Room</h1>
+    <div id="error"></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<script src="./api.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const roomId = params.get("roomId");
+
+const errorEl = document.getElementById("error");
+const contentEl = document.getElementById("content");
+const hotelNameEl = document.getElementById("hotelName");
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[m]));
+}
+
+function showError(msg) {
+  errorEl.innerHTML = msg ? `<div class="alert">${msg}</div>` : "";
+}
+
+if (!roomId) {
+  showError("roomId missing in URL");
+} else {
+  load();
+}
+
+async function load() {
+  try {
+    showError("");
+
+    const room = await api("/api/rooms/" + encodeURIComponent(roomId));
+
+    const hotels = await api("/api/hotels");
+
+    const hotel = hotels.find(h => h._id === room.hotelId);
+
+    hotelNameEl.textContent = hotel
+      ? `${hotel.name} • ${hotel.city}`
+      : "";
+
+    contentEl.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div><b>Room Number:</b> ${escapeHtml(room.roomNumber)}</div>
+          <div><b>Type:</b> ${escapeHtml(room.type)}</div>
+          <div><b>Price:</b> $${room.pricePerNight}/night</div>
+          <div><b>Status:</b> ${room.isActive ? "Active" : "Inactive"}</div>
+
+          <div class="hr"></div>
+          <div><b>Amenities:</b></div>
+          <div class="pills">
+            ${(room.amenities || [])
+              .map(a => `<span class="pill">${escapeHtml(a)}</span>`)
+              .join("") || `<span class="small">—</span>`}
+          </div>
+
+          ${
+            hotel
+              ? `<div class="hr"></div>
+                 <a href="./hotel.html?hotelId=${hotel._id}">
+                    <button class="secondary">Back to hotel</button>
+                 </a>`
+              : ""
+          }
+        </div>
+      </div>
+    `;
+
+  } catch (e) {
+    showError(e.message);
+  }
+}
+</script>

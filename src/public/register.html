@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Register</title>
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+
+<div class="container">
+  <div class="topbar">
+    <div class="nav">
+      <a class="badge" href="./index.html">Hotels</a>
+      <a class="badge nav-user" href="./my-bookings.html" style="display:none;">My bookings</a>
+
+      <a class="badge nav-guest" href="./login.html">Login</a>
+      <a class="badge nav-guest" href="./register.html">Register</a>
+
+      <button class="badge nav-logout" style="display:none;">Logout</button>
+    </div>
+    <span class="small">Account</span>
+  </div>
+
+  <div class="card">
+    <h1 class="h">Registration</h1>
+    <div id="error"></div>
+
+    <form id="form" class="grid">
+      <input id="fullName" type="text" placeholder="Full name" required/>
+      <input id="email" type="email" placeholder="Email" required/>
+      <input id="password" type="password" placeholder="Password (min 6)" minlength="6" required/>
+
+      <div class="row">
+        <button type="submit">Create account</button>
+        <a class="badge" href="./login.html">I already have an account</a>
+      </div>
+
+      <input id="adminSecret" type="text" placeholder="Admin secret (optional)"/>
+
+      <div class="small" id="result"></div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="./api.js"></script>
+<script src="./nav-auth.js"></script>
+<script>
+async function register() {
+  const fullName = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const adminSecretInput = document.getElementById("adminSecret");
+  const result = document.getElementById("result");
+
+  const adminSecret = adminSecretInput ? adminSecretInput.value.trim() : "";
+
+  result.innerText = "";
+
+  try {
+    if (!fullName || !email || !password) {
+      throw new Error("Fill full name, email and password");
+    }
+
+    const isAdmin = adminSecret.length > 0;
+
+    const path = isAdmin ? "/auth/register-admin" : "/auth/register";
+
+    const body = isAdmin
+      ? { fullName, email, password, adminSecret }
+      : { fullName, email, password };
+
+    const data = await api(path, { method: "POST", body });
+
+    if (data?.token) {
+      sessionStorage.setItem("token", data.token);
+      result.innerText = "Account created ✅ Redirecting...";
+      setTimeout(() => location.href = "./index.html", 600);
+      return;
+    }
+
+    result.innerText = data?.message || "Registered, but token not returned.";
+  } catch (e) {
+    result.innerText = e.message;
+  }
+}
+
+document.getElementById("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await register();
+});
+</script>
+
+</body>
+</html>

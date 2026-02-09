@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hotel Rooms — DELUX</title>
+
+  <link rel="stylesheet" href="./styles.css"/>
+
+  <style>
+    body{
+      background:#f6f2ea;
+      color:#111;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .wrap{ max-width:1100px; margin:0 auto; padding:22px 18px 120px; }
+
+    .topbar{
+      max-width:1100px; margin:0 auto;
+      padding:18px 18px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+    }
+    .nav{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+    .nav a{
+      text-decoration:none; color:#111;
+      font-size:13px; letter-spacing:.08em; text-transform:uppercase; opacity:.75;
+    }
+    .nav a:hover{ opacity:1; }
+    .brand img{ height:34px; width:auto; opacity:.92; }
+
+    .hero{
+      margin-top: 10px;
+      border-radius: 24px;
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 18px 45px rgba(0,0,0,.12);
+      background:#ddd;
+      position:relative;
+      min-height: 260px;
+    }
+    .hero img{ width:100%; height:360px; object-fit:cover; display:block; }
+    @media (max-width: 900px){ .hero img{ height:260px; } }
+    .hero::after{
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0) 55%);
+      pointer-events:none;
+    }
+    .heroText{
+      position:absolute; left:18px; right:18px; bottom:18px;
+      color:#fff; z-index:2;
+      display:flex; justify-content:space-between; align-items:flex-end;
+      gap:10px; flex-wrap:wrap;
+    }
+    .heroTitle{ margin:0; font-size:36px; letter-spacing:.01em; }
+    .heroMeta{ margin-top:6px; opacity:.9; font-size:14px; }
+    .pill{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      background: rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.25);
+      backdrop-filter: blur(6px);
+      font-weight:600; font-size:12px;
+    }
+
+    .panel{
+      margin-top: 16px;
+      background: rgba(255,255,255,.7);
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:22px;
+      box-shadow:0 12px 34px rgba(0,0,0,.08);
+      padding:14px;
+    }
+    .filters{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr auto;
+      gap:10px;
+      align-items:end;
+    }
+    @media (max-width: 900px){ .filters{ grid-template-columns: 1fr 1fr; } }
+
+    .field label{ display:block; font-size:12px; color:#333; opacity:.75; margin:0 0 6px 4px; }
+    .field input{
+      width:100%; padding:12px 12px;
+      border-radius:14px; border:1px solid rgba(0,0,0,.12);
+      background:#fff; outline:none; font-size:14px;
+    }
+    .field input:focus{
+      border-color: rgba(0,0,0,.25);
+      box-shadow:0 0 0 4px rgba(0,0,0,.06);
+    }
+
+    .checkRow{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; height:42px; padding:0 10px;
+      border-radius:14px; border:1px solid rgba(0,0,0,.12); background:#fff;
+    }
+    .checkRow span{ font-size:14px; color:#111; opacity:.9; }
+
+    .btn{
+      height:44px; padding:0 16px;
+      border-radius:999px; border:1px solid rgba(0,0,0,.18);
+      background:#fff; font-weight:700; cursor:pointer; letter-spacing:.02em;
+    }
+    .btn.primary{ background:#111; color:#fff; border-color:#111; }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+    .note{
+      margin-top: 10px;
+      font-size: 13px;
+      color:#444;
+      opacity:.9;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.75);
+    }
+
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    @media (max-width: 1000px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 650px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow:0 12px 30px rgba(0,0,0,.08);
+      display:flex; flex-direction:column;
+      min-height: 420px;
+    }
+    .cardImg{ height:190px; background:#eee; position:relative; }
+    .cardImg img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .tag{
+      position:absolute; left:12px; top:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(0,0,0,.55);
+      color:#fff; font-size:12px;
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(6px);
+    }
+    .cardBody{ padding:14px 14px 16px; display:flex; flex-direction:column; gap:10px; flex:1; }
+    .roomTitle{ margin:0; font-size:18px; color:#111; }
+    .roomDesc{ margin:0; color:#444; line-height:1.55; font-size:14px; opacity:.92; flex:1; }
+    .facts{ display:flex; flex-wrap:wrap; gap:8px; }
+    .fact{
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(0,0,0,.03);
+      font-size:12px; color:#222;
+    }
+    .cardFoot{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:14px;
+      border-top:1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.9);
+    }
+    .price{ font-weight:800; font-size:16px; color:#111; }
+    .muted{ display:block; font-size:12px; color:#666; font-weight:500; margin-top:2px; }
+
+    .empty{
+      margin-top:16px;
+      padding:18px;
+      background: rgba(255,255,255,.7);
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:18px;
+      color:#333;
+    }
+    .error{ border-color: rgba(220,0,0,.25); }
+  </style>
+  </style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-left">
+      <a class="nav-link" href="./index.html">Home</a>
+      <a class="nav-link" href="./hotels.html">Hotels</a>
+    </div>
+    <div class="brand">
+      <img class="brand-logo" src="./images/delux_l.png" alt="Delux Hotels">
+    </div>
+    <div class="nav-right">
+      <a class="nav-link nav-user" href="./profile.html" style="display:none;">Profile</a>
+      <a class="nav-link nav-user" href="./my-bookings.html" style="display:none;">My bookings</a>
+      <a class="nav-link nav-admin" href="./admin-hotels.html" style="display:none;">Admin hotels</a>
+      <a class="nav-link nav-admin" href="./admin-rooms.html" style="display:none;">Admin rooms</a>
+      <button class="icon-btn nav-logout" style="display:none;" title="Logout">⎋</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" id="heroBox">
+    <img id="heroImg" src="./images/hotel-1.jpg" alt="Hotel hero">
+    <div class="heroText">
+      <div>
+        <h1 class="heroTitle" id="hotelName">Rooms</h1>
+        <div class="heroMeta" id="hotelCity">Choose your room</div>
+      </div>
+      <div class="pill" id="hotelBadge">Hotel ID: -</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="filters">
+      <div class="field">
+        <label>Min price</label>
+        <input id="minPrice" type="number" placeholder="e.g. 50000">
+      </div>
+
+      <div class="field">
+        <label>Max price</label>
+        <input id="maxPrice" type="number" placeholder="e.g. 150000">
+      </div>
+
+      <div class="field">
+        <label>Dates</label>
+        <div class="checkRow" id="roomDates">
+          <span id="roomDatesText">Select dates</span>
+        </div>
+        <input id="checkIn" type="hidden">
+        <input id="checkOut" type="hidden">
+      </div>
+
+      <div class="field">
+        <label>Only active</label>
+        <div class="checkRow">
+          <span>Show available</span>
+          <input id="onlyActive" type="checkbox" checked>
+        </div>
+      </div>
+
+      <button class="btn primary" id="applyBtn">Apply</button>
+    </div>
+
+    <div class="note">
+      <span class="badge" id="statusBadge">Ready</span>
+      <button class="btn" id="resetBtn">Reset</button>
+    </div>
+  </section>
+
+  <section class="grid" id="roomsGrid"></section>
+  <div class="empty" id="emptyBox" style="display:none;"></div>
+
+</main>
+
+<div class="modal" id="mRoomDates">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b>Choose dates</b>
+      <button class="modal-close" data-close="mRoomDates">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="cal-grid">
+        <div class="cal" id="roomCal1"></div>
+        <div class="cal" id="roomCal2"></div>
+      </div>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+        <button class="icon-btn" id="btnRoomClearDates" title="Clear">⟲</button>
+        <button class="icon-btn" id="btnRoomApplyDates" title="Apply">✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="./api.js"></script>
+<script src="./nav-auth.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function openM(id){ document.getElementById(id).classList.add("open"); }
+  function closeM(id){ document.getElementById(id).classList.remove("open"); }
+
+  document.querySelectorAll("[data-close]").forEach(btn=>{
+    btn.addEventListener("click", ()=> closeM(btn.dataset.close));
+  });
+  document.querySelectorAll(".modal").forEach(m=>{
+    m.addEventListener("click", (e)=>{ if(e.target === m) m.classList.remove("open"); });
+  });
+
+  function getQueryParam(name){
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
+  }
+
+  function moneyKZT(n){
+    const num = Number(n) || 0;
+    return new Intl.NumberFormat("ru-RU").format(num) + " ₸";
+  }
+
+  const hotelId = getQueryParam("hotelId");
+  const initialCheckIn = getQueryParam("checkIn");
+  const initialCheckOut = getQueryParam("checkOut");
+
+  let roomState = {
+    checkIn: null,
+    checkOut: null
+  };
+  let hotelBookings = [];
+  let bookedByDate = {};
+
+  function setStatus(text, isError=false){
+    const b = $("statusBadge");
+    b.textContent = text;
+    b.classList.toggle("error", isError);
+  }
+
+  function renderRooms(list){
+    const grid = $("roomsGrid");
+    const empty = $("emptyBox");
+    grid.innerHTML = "";
+    empty.style.display = "none";
+
+    if (!list.length){
+      empty.style.display = "block";
+      empty.textContent = "No rooms found for your filters.";
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+
+    list.forEach(room => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const activeTag = room.isActive ? "Active" : "Inactive";
+
+      const titleText = room.type && room.roomNumber
+        ? `${room.type} • #${room.roomNumber}`
+        : (room.type || `Room ${room.roomNumber || ""}`);
+
+      const descText = room.description || "";
+
+      const facts = (room.amenities && Array.isArray(room.amenities) ? room.amenities : (room.facts || [])).slice(0,4);
+
+      const roomId = room._id || room.id || "";
+
+      card.innerHTML = `
+        <div class="cardImg">
+          <img src="${room.image || "./images/room.JPG"}" alt="${titleText}">
+          <div class="tag">${activeTag}</div>
+        </div>
+        <div class="cardBody">
+          <h3 class="roomTitle">${titleText}</h3>
+          <p class="roomDesc">${descText}</p>
+          <div class="facts">
+            ${facts.map(f => `<span class="fact">${f}</span>`).join("")}
+          </div>
+        </div>
+        <div class="cardFoot">
+          <div>
+            <div class="price">${moneyKZT(room.pricePerNight)}</div>
+            <span class="muted">per night</span>
+          </div>
+          <button class="btn primary" data-room="${roomId}">Book</button>
+        </div>
+      `;
+
+      card.querySelector("button").addEventListener("click", async () => {
+        const token = sessionStorage.getItem("token");
+        if (!token){
+          sessionStorage.setItem("openAuth", "login");
+          location.href = "./index.html";
+          return;
+        }
+
+        const inVal = $("checkIn").value;
+        const outVal = $("checkOut").value;
+        if (!inVal || !outVal){
+          showToast("Please choose check-in and check-out dates.", "error");
+          return;
+        }
+
+        try{
+          await api("/api/bookings", {
+            method: "POST",
+            body: { roomId, checkIn: inVal, checkOut: outVal }
+          });
+          showToast("Booking created successfully.", "success");
+        } catch(err){
+          showToast(err.message, "error");
+        }
+      });
+
+      frag.appendChild(card);
+    });
+
+    grid.appendChild(frag);
+  }
+
+  function buildRoomsUrl(){
+    const min = $("minPrice").value.trim();
+    const max = $("maxPrice").value.trim();
+    const onlyActive = $("onlyActive").checked;
+
+    const params = new URLSearchParams();
+    params.set("hotelId", hotelId);
+    if (min) params.set("minPrice", min);
+    if (max) params.set("maxPrice", max);
+    if (onlyActive) params.set("isActive", "true");
+
+    return `/api/rooms?` + params.toString();
+  }
+
+  async function loadHotel(){
+    return api(`/api/hotels/${encodeURIComponent(hotelId)}`);
+  }
+
+  async function loadRooms(){
+    const data = await api(buildRoomsUrl());
+    let rooms = data.rooms || data;
+
+    const inVal = $("checkIn").value;
+    const outVal = $("checkOut").value;
+    const onlyActive = $("onlyActive").checked;
+
+    if (inVal && outVal && onlyActive && Array.isArray(rooms) && rooms.length){
+      const checks = await Promise.all(
+        rooms.map(r =>
+          api(`/api/bookings/availability?roomId=${encodeURIComponent(r._id || r.id)}&checkIn=${encodeURIComponent(inVal)}&checkOut=${encodeURIComponent(outVal)}`)
+            .catch(() => ({ available: false }))
+        )
+      );
+      rooms = rooms.filter((r, idx) => checks[idx]?.available);
+    }
+
+    return rooms;
+  }
+
+  function buildBookedMap(){
+    bookedByDate = {};
+    hotelBookings.forEach(b => {
+      if (!b.checkIn || !b.checkOut) return;
+      const start = new Date(b.checkIn);
+      const end = new Date(b.checkOut);
+      for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+        const key = d.toISOString().slice(0,10);
+        if (!bookedByDate[key]) bookedByDate[key] = [];
+        const room = b.roomId || {};
+        const label = (room.roomNumber ? `#${room.roomNumber}` : "Room") +
+          (room.type ? ` (${room.type})` : "");
+        if (!bookedByDate[key].includes(label)) {
+          bookedByDate[key].push(label);
+        }
+      }
+    });
+  }
+
+  function monthNameRoom(m){
+    return ["January","February","March","April","May","June","July","August","September","October","November","December"][m];
+  }
+
+  function buildRoomCalendar(containerId, year, month){
+    const el = document.getElementById(containerId);
+    const first = new Date(year, month, 1);
+    const startDay = (first.getDay()+6)%7; 
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const weeks = [];
+    let day = 1 - startDay;
+    for(let w=0; w<6; w++){
+      const row = [];
+      for(let i=0; i<7; i++){
+        row.push(day);
+        day++;
+      }
+      weeks.push(row);
+    }
+
+    const title = `
+      <div class="cal-title">
+        <span>${monthNameRoom(month)} <span style="font-weight:500;opacity:.7">${year}</span></span>
+        <span style="opacity:.6">›</span>
+      </div>
+    `;
+
+    const head = `
+      <table class="cal-table">
+        <thead>
+          <tr>
+            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+          </tr>
+        </thead>
+        <tbody>
+        ${weeks.map(r=>`
+          <tr>
+            ${r.map(n=>{
+              const inMonth = n>=1 && n<=daysInMonth;
+              if(!inMonth) return `<td class="disabled"></td>`;
+              const date = new Date(year, month, n);
+              const isoFull = date.toISOString();
+              const key = isoFull.slice(0,10);
+              const isPast = date < today;
+              const sel =
+                (roomState.checkIn && new Date(roomState.checkIn).toDateString()===date.toDateString()) ||
+                (roomState.checkOut && new Date(roomState.checkOut).toDateString()===date.toDateString());
+              const hasBookings = !!bookedByDate[key];
+              const classes = [
+                isPast ? "disabled" : "",
+                sel ? "sel" : "",
+                hasBookings ? "has-bookings" : ""
+              ].filter(Boolean).join(" ");
+              const dataAttrs = isPast ? "" : `data-iso="${isoFull}"`;
+              return `<td ${dataAttrs} class="${classes}">${n}</td>`;
+            }).join("")}
+          </tr>
+        `).join("")}
+        </tbody>
+      </table>
+    `;
+
+    el.innerHTML = title + head;
+
+    el.querySelectorAll("td[data-iso]").forEach(td=>{
+      td.addEventListener("click", ()=>{
+        const iso = td.dataset.iso;
+        const key = iso.slice(0,10);
+
+        if (bookedByDate[key]) {
+          const list = bookedByDate[key].join(", ");
+          showToast("Already booked on this date: " + list, "error");
+        }
+
+        if (!roomState.checkIn){
+          roomState.checkIn = iso;
+          roomState.checkOut = null;
+        } else if (!roomState.checkOut){
+          const inD = new Date(roomState.checkIn);
+          const outD = new Date(iso);
+          if (outD <= inD){
+            roomState.checkIn = iso;
+            roomState.checkOut = null;
+          } else {
+            roomState.checkOut = iso;
+          }
+        } else {
+          roomState.checkIn = iso;
+          roomState.checkOut = null;
+        }
+        renderRoomCalendars();
+        syncRoomDatesUI();
+      });
+    });
+  }
+
+  function renderRoomCalendars(){
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    buildRoomCalendar("roomCal1", y, m);
+    buildRoomCalendar("roomCal2", y, (m+1)%12);
+  }
+
+  function syncRoomDatesUI(){
+    const label = document.getElementById("roomDatesText");
+    const inVal = roomState.checkIn;
+    const outVal = roomState.checkOut;
+    function fmt(d){
+      const x = new Date(d);
+      const mm = String(x.getMonth()+1).padStart(2,"0");
+      const dd = String(x.getDate()).padStart(2,"0");
+      return `${dd}.${mm}.${x.getFullYear()}`;
+    }
+    if (inVal && outVal){
+      label.textContent = `${fmt(inVal)} → ${fmt(outVal)}`;
+    } else if (inVal){
+      label.textContent = fmt(inVal);
+    } else {
+      label.textContent = "Select dates";
+    }
+
+    $("checkIn").value = inVal ? inVal.slice(0,10) : "";
+    $("checkOut").value = outVal ? outVal.slice(0,10) : "";
+  }
+
+  function showSelectHotelMessage(){
+    $("hotelName").textContent = "Rooms";
+    $("hotelCity").textContent = "Select a hotel first";
+    $("hotelBadge").textContent = "Hotel ID: —";
+    $("emptyBox").style.display = "block";
+    $("emptyBox").textContent =
+      "No hotel selected. Open this page like: hotel.html?hotelId=YOUR_ID";
+    setStatus("Missing hotelId", true);
+
+    $("applyBtn").disabled = true;
+  }
+
+  async function init(){
+    if (!hotelId){
+      showSelectHotelMessage();
+      return;
+    }
+
+    $("hotelBadge").textContent = "Hotel ID: " + hotelId;
+
+    try{
+      hotelBookings = await api(`/api/bookings/calendar?hotelId=${encodeURIComponent(hotelId)}`);
+      buildBookedMap();
+    } catch(e){}
+
+    if (initialCheckIn) roomState.checkIn = initialCheckIn;
+    if (initialCheckOut) roomState.checkOut = initialCheckOut;
+    renderRoomCalendars();
+    syncRoomDatesUI();
+    setStatus("Loading…");
+
+    try{
+      const h = await loadHotel();
+
+      $("hotelName").textContent = h.name || "Hotel Rooms";
+      $("hotelCity").textContent = h.city || "";
+
+      const HERO_IMAGES = {
+        "1ce6113b6230439bf1fdddab": "./images/hotel-1.jpg",
+        "7185087049419bd7d25a55cc": "./images/hotel-2.jpg",
+        "ec47c0e40f422b8629741c68": "./images/hotel-3.jpg",
+        "697f8d192f3ecad7048c0b5e": "./images/hotel-4.jpg",
+        "698232f095b6d9eca03bd6e6": "./images/hotel-5.jpg"
+      };
+      const hid = String(h._id || hotelId || "");
+      const heroSrc = HERO_IMAGES[hid] || h.heroImage || "./images/hotel-1.jpg";
+      $("heroImg").src = heroSrc;
+
+      const rooms = await loadRooms();
+      renderRooms(rooms);
+
+      setStatus("Loaded: " + rooms.length + " rooms");
+    } catch(err){
+      $("emptyBox").style.display = "block";
+      $("emptyBox").textContent =
+        "Could not load data from server. Check backend endpoints or hotelId.";
+      setStatus("Error loading data", true);
+    }
+  }
+
+  function resetFilters(){
+    $("minPrice").value = "";
+    $("maxPrice").value = "";
+    $("onlyActive").checked = true;
+  }
+
+  $("applyBtn").addEventListener("click", async () => {
+    if (!hotelId) return;
+    setStatus("Loading…");
+    try{
+      const rooms = await loadRooms();
+      renderRooms(rooms);
+      setStatus("Loaded: " + rooms.length + " rooms");
+    } catch(e){
+      setStatus("Error loading data", true);
+    }
+  });
+
+  $("resetBtn").addEventListener("click", async () => {
+    resetFilters();
+    if (!hotelId) return;
+    setStatus("Loading…");
+    try{
+      const rooms = await loadRooms();
+      renderRooms(rooms);
+      setStatus("Loaded: " + rooms.length + " rooms");
+    } catch(e){
+      setStatus("Error loading data", true);
+    }
+  });
+
+  document.getElementById("roomDates").addEventListener("click", () => {
+    renderRoomCalendars();
+    openM("mRoomDates");
+  });
+
+  document.getElementById("btnRoomClearDates").addEventListener("click", () => {
+    roomState.checkIn = null;
+    roomState.checkOut = null;
+    renderRoomCalendars();
+    syncRoomDatesUI();
+  });
+
+  document.getElementById("btnRoomApplyDates").addEventListener("click", () => {
+    closeM("mRoomDates");
+    syncRoomDatesUI();
+  });
+
+  init();
+</script>
+
+</body>
+</html>

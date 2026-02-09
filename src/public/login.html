@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+
+<div class="container">
+  <div class="topbar">
+    <div class="nav">
+      <a class="badge" href="./index.html">Hotels</a>
+      <a class="badge nav-user" href="./my-bookings.html" style="display:none;">My bookings</a>
+
+      <a class="badge nav-guest" href="./login.html">Login</a>
+      <a class="badge nav-guest" href="./register.html">Register</a>
+
+      <button class="badge nav-logout" style="display:none;">Logout</button>
+    </div>
+    <span class="small">Account</span>
+  </div>
+
+  <div class="card">
+    <h1 class="h">Login</h1>
+    <div id="error"></div>
+
+    <form id="form" class="grid">
+      <input id="email" type="email" placeholder="Email" required/>
+      <input id="password" type="password" placeholder="Password" required/>
+
+      <div class="row">
+        <button type="submit">Login</button>
+        <a class="badge" href="./register.html">Create account</a>
+        <a class="badge" href="./admin-login.html">Admin login</a>
+      </div>
+
+      <div class="small" id="status"></div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="./api.js"></script>
+<script src="./nav-auth.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+
+function showError(msg){
+  $("error").innerHTML = msg ? `<div class="alert">${msg}</div>` : "";
+}
+
+$("form").onsubmit = async (e) => {
+  e.preventDefault();
+  showError("");
+  $("status").textContent = "Loading...";
+
+  try {
+    const body = {
+      email: $("email").value.trim(),
+      password: $("password").value
+    };
+
+    const res = await api("/auth/login", { method:"POST", body });
+
+    if (res?.token) sessionStorage.setItem("token", res.token);
+
+    $("status").textContent = "Success! Redirecting...";
+    setTimeout(()=> location.href="./index.html", 700);
+  } catch (err) {
+    $("status").textContent = "";
+    showError(err.message);
+  }
+};
+</script>
+</body>
+</html>

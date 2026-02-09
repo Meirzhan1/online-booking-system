@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Rooms</title>
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-left">
+      <a class="nav-link" href="./index.html">Home</a>
+      <a class="nav-link" href="./hotels.html">Hotels</a>
+    </div>
+    <div class="brand">
+      <img class="brand-logo" src="./images/delux_l.png" alt="Delux Hotels">
+    </div>
+    <div class="nav-right">
+      <a class="nav-link nav-admin" href="./admin-hotels.html" style="display:none;">Admin hotels</a>
+      <a class="nav-link nav-admin" href="./admin-rooms.html" style="display:none;">Admin rooms</a>
+      <button class="icon-btn nav-logout" style="display:none;" title="Logout">⎋</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="grid2">
+    <div class="card">
+      <h1 class="h">Rooms</h1>
+
+      <div class="row">
+        <select id="filterHotel">
+          <option value="">All hotels</option>
+        </select>
+        <button id="btnFilter" class="secondary">Apply</button>
+        <span class="small" id="status"></span>
+      </div>
+
+      <div class="hr"></div>
+      <div id="error"></div>
+      <div class="grid" id="list"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="h" id="formTitle">Add room</h2>
+      <div class="small">Amenities: через запятую. Toggle active = PATCH.</div>
+      <div class="hr"></div>
+
+      <form id="form" class="grid">
+        <select id="hotelId" required>
+          <option value="">Select hotel (required)</option>
+        </select>
+        <input id="roomNumber" placeholder="roomNumber" required/>
+        <input id="type" placeholder="type" required/>
+        <input id="pricePerNight" type="number" placeholder="pricePerNight" value="0" required/>
+        <input id="amenities" placeholder="amenities (wifi,tv,...)"/>
+        <label class="row small">
+          <input id="isActive" type="checkbox" checked/> isActive
+        </label>
+
+        <div class="row">
+          <button type="submit" id="btnSave">Save</button>
+          <button type="button" class="secondary" id="btnCancel" style="display:none">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script src="./api.js"></script>
+<script src="./nav-auth.js"></script>
+<script>
+const token = sessionStorage.getItem("token");
+if (!token) location.href = "./index.html";
+
+const payload = JSON.parse(atob(token.split(".")[1]));
+if (payload.role !== "ADMIN") {
+  alert("Access denied");
+  location.href = "./index.html";
+}
+
+const $ = (id) => document.getElementById(id);
+let editingId = null;
+
+function showError(msg) {
+  $("error").innerHTML = msg ? `<div class="alert">${msg}</div>` : "";
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[m]));
+}
+
+function parseAmenities(text) {
+  return (text || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function formPayload() {
+  return {
+    hotelId: $("hotelId").value,
+    roomNumber: $("roomNumber").value.trim(),
+    type: $("type").value.trim(),
+    pricePerNight: Number($("pricePerNight").value || 0),
+    amenities: parseAmenities($("amenities").value),
+    isActive: $("isActive").checked
+  };
+}
+
+function fillForm(r) {
+  $("hotelId").value = r.hotelId || "";
+  $("roomNumber").value = r.roomNumber || "";
+  $("type").value = r.type || "";
+  $("pricePerNight").value = r.pricePerNight ?? 0;
+  $("amenities").value = (r.amenities || []).join(", ");
+  $("isActive").checked = !!r.isActive;
+}
+
+function resetForm() {
+  editingId = null;
+  $("formTitle").textContent = "Add room";
+  $("btnCancel").style.display = "none";
+  fillForm({ hotelId: "", roomNumber: "", type: "", pricePerNight: 0, amenities: [], isActive: true });
+}
+
+async function loadHotelsForSelects() {
+  const hotels = await api("/api/hotels");
+  const options = (hotels || [])
+    .map((h) => `<option value="${h._id}">${escapeHtml(h.name)} (${escapeHtml(h.city)})</option>`)
+    .join("");
+
+  $("hotelId").innerHTML = `<option value="">Select hotel (required)</option>` + options;
+  $("filterHotel").innerHTML = `<option value="">All hotels</option>` + options;
+}
+
+async function loadRooms() {
+  showError("");
+  $("status").textContent = "Loading...";
+
+  const hotelId = $("filterHotel").value || undefined;
+  const rooms = await api("/api/rooms" + qs({ hotelId }));
+
+  $("list").innerHTML =
+    (rooms || [])
+      .map(
+        (r) => `
+    <div class="card item">
+      <div>
+        <h3>Room ${escapeHtml(r.roomNumber)} • ${escapeHtml(r.type)}</h3>
+        <div class="meta">$${r.pricePerNight}/night • ${r.isActive ? "Active" : "Inactive"}</div>
+        <div class="pills">${(r.amenities || [])
+          .map((a) => `<span class="pill">${escapeHtml(a)}</span>`)
+          .join("")}</div>
+        <div class="small">hotelId: <code>${escapeHtml(r.hotelId)}</code></div>
+        <div class="small">id: <code>${escapeHtml(r._id)}</code></div>
+      </div>
+      <div class="row">
+        <button class="secondary" onclick='edit(${JSON.stringify(r).replace(/'/g, "&#039;")})'>Edit</button>
+        <button class="secondary" onclick='toggle("${r._id}", ${!!r.isActive})'>
+            ${r.isActive ? "Disable" : "Enable"}
+        </button>
+        <button class="danger" onclick='del("${r._id}")'>Delete</button>
+      </div>
+    </div>
+    `
+      )
+      .join("") || `<div class="small">No rooms.</div>`;
+
+  $("status").textContent = `${(rooms || []).length} rooms`;
+}
+
+window.edit = (r) => {
+  editingId = r._id;
+  $("formTitle").textContent = "Edit room";
+  $("btnCancel").style.display = "inline-block";
+  fillForm(r);
+};
+
+window.toggle = async (id, current) => {
+  try {
+    await api("/api/rooms/" + encodeURIComponent(id), {
+      method: "PATCH",
+      body: { isActive: !current }
+    });
+    await loadRooms();
+  } catch (e) {
+    showError(e.message);
+  }
+};
+
+window.del = async (id) => {
+  if (!confirm("Delete room?")) return;
+  try {
+    await api("/api/rooms/" + encodeURIComponent(id), { method: "DELETE" });
+    await loadRooms();
+    if (editingId === id) resetForm();
+  } catch (e) {
+    showError(e.message);
+  }
+};
+
+$("btnCancel").onclick = resetForm;
+$("btnFilter").onclick = loadRooms;
+
+$("form").onsubmit = async (e) => {
+  e.preventDefault();
+  showError("");
+
+  try {
+    const body = formPayload();
+
+    if (!body.hotelId || !body.roomNumber || !body.type) {
+      throw new Error("Fill all required fields");
+    }
+
+    if (editingId) {
+      await api("/api/rooms/" + encodeURIComponent(editingId), {
+        method: "PUT",
+        body
+      });
+    } else {
+      await api("/api/rooms", { method: "POST", body });
+    }
+
+    resetForm();
+    await loadRooms();
+
+  } catch (e) {
+    showError(e.message);
+  }
+};
+
+(async function init() {
+  await loadHotelsForSelects();
+  await loadRooms();
+})();
+</script>

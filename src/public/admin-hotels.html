@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Hotels</title>
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-left">
+      <a class="nav-link" href="./index.html">Home</a>
+      <a class="nav-link" href="./hotels.html">Hotels</a>
+    </div>
+    <div class="brand">
+      <img class="brand-logo" src="./images/delux_l.png" alt="Delux Hotels">
+    </div>
+    <div class="nav-right">
+      <a class="nav-link nav-admin" href="./admin-hotels.html" style="display:none;">Admin hotels</a>
+      <a class="nav-link nav-admin" href="./admin-rooms.html" style="display:none;">Admin rooms</a>
+      <button class="icon-btn nav-logout" style="display:none;" title="Logout">⎋</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="grid2">
+    <div class="card">
+      <h1 class="h">Hotels</h1>
+      <div id="error"></div>
+      <div class="grid" id="list"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="h" id="formTitle">Add hotel</h2>
+      <div class="small">PUT используется для полного обновления.</div>
+      <div class="hr"></div>
+
+      <form id="form" class="grid">
+        <input id="name" placeholder="name" required/>
+        <input id="city" placeholder="city" required/>
+        <input id="address" placeholder="address" required/>
+        <textarea id="description" placeholder="description"></textarea>
+        <input id="rating" type="number" placeholder="rating" value="0"/>
+
+        <div class="row">
+          <button type="submit" id="btnSave">Save</button>
+          <button type="button" class="secondary" id="btnCancel" style="display:none">Cancel</button>
+        </div>
+        <div class="small" id="status"></div>
+      </form>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script src="./api.js"></script>
+<script src="./nav-auth.js"></script>
+<script>
+
+const token = sessionStorage.getItem("token");
+if (!token) location.href = "./index.html";
+
+const payload = JSON.parse(atob(token.split(".")[1]));
+if (payload.role !== "ADMIN") {
+  alert("Access denied");
+  location.href = "./index.html";
+}
+
+const $ = (id) => document.getElementById(id);
+
+let editingId = null;
+
+function showError(msg) {
+  $("error").innerHTML = msg
+    ? `<div class="alert">${msg}</div>`
+    : "";
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (m) =>
+    ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[m])
+  );
+}
+
+function getFormPayload() {
+  return {
+    name: $("name").value.trim(),
+    city: $("city").value.trim(),
+    address: $("address").value.trim(),
+    description: $("description").value.trim(),
+    rating: Number($("rating").value || 0)
+  };
+}
+
+function fillForm(h) {
+  $("name").value = h.name || "";
+  $("city").value = h.city || "";
+  $("address").value = h.address || "";
+  $("description").value = h.description || "";
+  $("rating").value = h.rating ?? 0;
+}
+
+function resetForm() {
+  editingId = null;
+  $("formTitle").textContent = "Add hotel";
+  $("btnCancel").style.display = "none";
+  fillForm({ name: "", city: "", address: "", description: "", rating: 0 });
+}
+
+
+async function loadHotels() {
+  try {
+    $("status").textContent = "Loading...";
+    showError("");
+
+    const hotels = await api("/api/hotels");
+
+    $("list").innerHTML =
+      (hotels || [])
+        .map(
+          (h) => `
+      <div class="card item">
+        <div>
+          <h3>${escapeHtml(h.name)}</h3>
+          <div class="meta">${escapeHtml(h.city)} • ${escapeHtml(h.address)}</div>
+
+          <div class="pills">
+            <span class="pill">rating: ${h.rating ?? 0}</span>
+            <span class="pill">id: ${escapeHtml(h._id)}</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="secondary"
+            onclick='edit(${JSON.stringify(h).replace(/'/g, "&#039;")})'>
+              Edit
+          </button>
+          <button class="danger"
+            onclick='del("${h._id}")'>
+              Delete
+          </button>
+        </div>
+      </div>
+    `
+        )
+        .join("") || `<div class="small">No hotels.</div>`;
+
+    $("status").textContent = `${(hotels || []).length} hotels`;
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+window.edit = (hotel) => {
+  editingId = hotel._id;
+  $("formTitle").textContent = "Edit hotel";
+  $("btnCancel").style.display = "inline-block";
+  fillForm(hotel);
+};
+
+window.del = async (id) => {
+  if (!confirm("Delete hotel?")) return;
+
+  try {
+    await api("/api/hotels/" + encodeURIComponent(id), {
+      method: "DELETE"
+    });
+    await loadHotels();
+    if (editingId === id) resetForm();
+  } catch (e) {
+    showError(e.message);
+  }
+};
+
+$("btnCancel").onclick = resetForm;
+
+
+$("form").onsubmit = async (e) => {
+  e.preventDefault();
+  showError("");
+
+  try {
+    const body = getFormPayload();
+
+    if (!body.name || !body.city || !body.address) {
+      throw new Error("name, city and address are required");
+    }
+
+    if (editingId) {
+      await api("/api/hotels/" + encodeURIComponent(editingId), {
+        method: "PUT",
+        body
+      });
+    } else {
+      await api("/api/hotels", {
+        method: "POST",
+        body
+      });
+    }
+
+    resetForm();
+    await loadHotels();
+  } catch (e) {
+    showError(e.message);
+  }
+};
+
+loadHotels();
+</script>

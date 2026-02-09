@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Login — DELUX</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <script src="./api.js"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-left">
+      <a class="nav-link" href="./index.html">Hotels</a>
+      <a class="nav-link" href="./login.html">Login</a>
+      <a class="nav-link" href="./register.html">Register</a>
+    </div>
+
+    <div class="brand">
+      <img class="brand-logo" src="./images/delux_l.png" alt="Delux Hotels">
+    </div>
+
+    <div class="nav-right">
+      <a class="nav-link" href="./my-bookings.html">My bookings</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-page">
+  <div class="auth-card">
+    <div class="auth-title">Admin Login</div>
+    <div class="auth-sub">Sign in with admin secret.</div>
+
+    <div id="adminErr" class="alert hidden"></div>
+
+    <div class="auth-form">
+      <input id="email" placeholder="Email" autocomplete="username"/>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password"/>
+      <input id="secret" placeholder="Admin secret"/>
+
+      <div class="auth-actions">
+        <button class="btn-pill primary" id="adminLoginBtn">Login as Admin</button>
+        <a class="btn-link" href="./login.html">I’m not admin</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const errBox = document.getElementById("adminErr");
+
+  function showErr(msg){
+    errBox.textContent = msg;
+    errBox.classList.toggle("hidden", !msg);
+  }
+
+  document.getElementById("adminLoginBtn").onclick = async () => {
+    try {
+      showErr("");
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const adminSecret = document.getElementById("secret").value.trim();
+
+      if (!email || !password || !adminSecret) {
+        throw new Error("Fill email, password and admin secret");
+      }
+
+      const path = "/auth/admin-login";
+
+      const res = await api(path, {
+        method: "POST",
+        body: { email, password, adminSecret }
+      });
+
+      if (!res?.token) throw new Error("No token returned");
+
+      sessionStorage.setItem("token", res.token);
+      location.href = "./admin-hotels.html";
+    } catch (e) {
+      showErr(e.message);
+    }
+  };
+</script>
+
+</body>
+</html>
