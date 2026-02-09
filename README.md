@@ -182,6 +182,8 @@ Example request (`POST /payments`):
 - `/admin-hotels.html` - admin hotels management page
 - `/admin-rooms.html` - admin rooms management page
 
+## Deploy preview:https://online-booking-system-6t50.onrender.com
+
 ## Screenshots of Features
 
 ### 1. Main Landing
@@ -206,9 +208,13 @@ Room visual used for room!(![photo_5211067899253036275_w](https://github.com/use
 )
 Amenities visual section highlighting guest experience.
 
+
+
+
 ## Notes
 
 - Keep `.env` local and never commit it.
 - Use `.env.example` as the environment template.
+
 
 
