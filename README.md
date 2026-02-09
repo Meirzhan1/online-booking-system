@@ -184,22 +184,25 @@ Example request (`POST /payments`):
 
 ## Screenshots of Features
 
-### 1. Main Landing!(https://github.com/user-attachments/assets/7125f683-40cd-42e9-ba73-c937527e4b4e)
+### 1. Main Landing
+Main Landing!(![photo_5211067899253036277_w](https://github.com/user-attachments/assets/67b5f803-2bd9-4e7a-84b9-496a455abd82)
+)
 
 Entry section of the platform, showing brand identity and primary navigation.
 
 ### 2. Hotels Catalog
-![Hotels Catalog](https://github.com/user-attachments/assets/c13a2d33-e924-4931-b581-dd5430c48078)
-()
+![Hotels Catalog](![photo_5211067899253036278_w](https://github.com/user-attachments/assets/838f81db-cfe5-40a6-9d0d-a4b7399f8741)
+)
 Hotel listing view where users browse available hotel options.
 
 ### 3. Room Experience
 ![Room Experience]()
-Room visual used for room!(https://github.com/user-attachments/assets/023a07d4-9d5f-4f49-bc99-50093204d120)
+Room visual used for room!(![photo_5211067899253036275_w](https://github.com/user-attachments/assets/e5bb78cc-83d4-44af-9536-042fc6cbdf94)
+)
  details and booking context.
 
 ### 4. Amenities Preview
-![Amenities Preview]("https://github.com/user-attachments/assets/b59c4d12-6e22-409d-aaed-f6994c016877"
+![Amenities Preview](![photo_5211067899253036275_w](https://github.com/user-attachments/assets/1de090db-250b-48ac-bc6a-2a08f3d333a4)
 )
 Amenities visual section highlighting guest experience.
 
